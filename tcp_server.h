@@ -22,17 +22,24 @@
 #define CHECK_USAGE 5
 
 typedef struct tcp_str_t {
-    char buf[TCP_BUF_SZ];
-    int buf_sz;
+    char sbuf[TCP_BUF_SZ];
+    size_t sbuf_sz;
+    char *buf;
+    ssize_t buf_sz;
     struct tcp_str_t *next;
 } tcp_str_t;
 typedef tcp_str_t *tcp_str;
 
 typedef struct tcp_client_t {
     int fd;
-    tcp_str buf;
     struct sockaddr_in addr;
     socklen_t addr_sz;
+    tcp_str_t reader_str;
+    tcp_str_t writer_str;
+    pthread_t reader_thread;
+    pthread_t writer_thread;
+    pthread_mutex_t reader_stick;
+    pthread_mutex_t writer_stick;
     struct tcp_client_t *next;
     struct tcp_client_t *prev;
 } tcp_client_t;
@@ -88,14 +95,14 @@ socket_accept();
 /*
  *
  * */
-int
-socket_recv();
+void *
+socket_recv(void *);
 
 /*
  *
  * */
-int
-socket_send();
+void *
+socket_send(void *);
 
 /*
  *
