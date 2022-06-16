@@ -61,6 +61,12 @@ build CMakeFiles/tcp_socket.dir/tcp_server.c.o: C_COMPILER__tcp_socket_Debug /Us
   OBJECT_DIR = CMakeFiles/tcp_socket.dir
   OBJECT_FILE_DIR = CMakeFiles/tcp_socket.dir
 
+build CMakeFiles/tcp_socket.dir/Dictionary.cpp.o: CXX_COMPILER__tcp_socket_Debug /Users/macos/CLionProjects/tcp_socket/Dictionary.cpp || cmake_object_order_depends_target_tcp_socket
+  DEP_FILE = CMakeFiles/tcp_socket.dir/Dictionary.cpp.o.d
+  FLAGS = -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk
+  OBJECT_DIR = CMakeFiles/tcp_socket.dir
+  OBJECT_FILE_DIR = CMakeFiles/tcp_socket.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target tcp_socket
@@ -69,7 +75,7 @@ build CMakeFiles/tcp_socket.dir/tcp_server.c.o: C_COMPILER__tcp_socket_Debug /Us
 #############################################
 # Link the executable tcp_socket
 
-build tcp_socket: CXX_EXECUTABLE_LINKER__tcp_socket_Debug CMakeFiles/tcp_socket.dir/main.cpp.o CMakeFiles/tcp_socket.dir/tcp_server.c.o
+build tcp_socket: CXX_EXECUTABLE_LINKER__tcp_socket_Debug CMakeFiles/tcp_socket.dir/main.cpp.o CMakeFiles/tcp_socket.dir/tcp_server.c.o CMakeFiles/tcp_socket.dir/Dictionary.cpp.o
   FLAGS = -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk
   OBJECT_DIR = CMakeFiles/tcp_socket.dir
   POST_BUILD = :

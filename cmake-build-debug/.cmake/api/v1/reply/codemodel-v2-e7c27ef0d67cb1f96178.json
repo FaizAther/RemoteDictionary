@@ -9,7 +9,7 @@
 					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
 					"minimumCMakeVersion" : 
 					{
-						"string" : "2.8.11"
+						"string" : "3.0"
 					},
 					"projectIndex" : 0,
 					"source" : ".",
@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "tcp_socket::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-tcp_socket-Debug-114c65e2008ab4d246df.json",
+					"jsonFile" : "target-tcp_socket-Debug-ffa7f4a2a75074d2230b.json",
 					"name" : "tcp_socket",
 					"projectIndex" : 0
 				}
