@@ -6,7 +6,6 @@
 #define TCP_SOCKET_TCP_SERVER_H
 
 #include <sys/poll.h>
-#include <sys/types.h>
 #include <arpa/inet.h>
 
 #define TCP_POLL_CHUNK_SZ 1024
