@@ -189,10 +189,10 @@ int
 t_remove_client(tcp_client curr) {
     t_remove_buf(curr->buf);
     if (tcpSocket.clients.curr == tcpSocket.clients.head) { /* head case */
-        curr->next->prev = curr->prev;
+        if (curr->next != NULL) { curr->next->prev = curr->prev;}
         tcpSocket.clients.head = curr->next;
     } else if (tcpSocket.clients.curr == tcpSocket.clients.tail) { /* tail case */
-        curr->prev->next = curr->next;
+        if (curr->prev != NULL) { curr->prev->next = curr->next; }
         tcpSocket.clients.tail = curr->prev;
     } else { /* center case */
         curr->next->prev = curr->prev;
