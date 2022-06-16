@@ -19,6 +19,8 @@
 
 #define TCP_BUF_SZ 1460
 
+#define CHECK_USAGE 5
+
 typedef struct tcp_str_t {
     char buf[TCP_BUF_SZ];
     int buf_sz;
@@ -45,7 +47,10 @@ typedef tcp_clients_list_t *tcp_clients_list;
 
 typedef struct tcp_socket_t {
     int fd;
-    struct pollfd pfds[TCP_POLL_CHUNK_SZ];
+    struct pollfd *poll_fds;
+    uint32_t poll_fds_sz;
+    nfds_t poll_max;
+    int poll_ret;
     tcp_clients_list_t clients;
     struct sockaddr_in addr;
     socklen_t addr_sz;
@@ -94,7 +99,7 @@ socket_send();
 /*
  *
  * */
-int
+_Noreturn int
 server_start();
 
 #endif //TCP_SOCKET_TCP_SERVER_H

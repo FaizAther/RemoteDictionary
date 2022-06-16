@@ -10,6 +10,24 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <unistd.h>
+
+void
+exit_func (int signo)
+{
+    fprintf(stderr, \
+		"\nGot signo{%d}\nTerminating...\n\n", \
+		signo);
+
+    close(tcpSocket.fd);
+
+    fprintf(stderr, "SLEEP: %u seconds, check memusage\n", CHECK_USAGE);
+
+    sleep(CHECK_USAGE);
+
+    //pthread_exit(0);
+    exit(EXIT_SUCCESS);
+}
 
 /*
  *
@@ -17,7 +35,7 @@
 int
 socket_init()
 {
-    fprintf(stderr, "ERR: %s __start\n", __func__ );
+    fprintf(stderr, "ERR: %s __start\n", __func__);
 
     memset(&tcpSocket, 0, sizeof(tcpSocket));
     tcpSocket.addr.sin_len = tcpSocket.addr_sz = sizeof(tcpSocket.addr);
@@ -46,7 +64,15 @@ socket_init()
 
     memset(&tcpSocket.clients, 0, sizeof(tcp_clients_list_t));
 
-    fprintf(stderr, "ERR: %s __end\n", __func__ );
+    tcpSocket.poll_max = 1;
+
+    tcpSocket.poll_fds = (struct pollfd *)malloc(sizeof(struct pollfd) * TCP_POLL_CHUNK_SZ);
+    tcpSocket.poll_fds_sz = TCP_POLL_CHUNK_SZ;
+
+    tcpSocket.poll_fds->fd = tcpSocket.fd;
+    tcpSocket.poll_fds->events = POLLIN | POLLPRI;
+
+    fprintf(stderr, "ERR: %s __end\n", __func__);
     return 0;
 }
 
@@ -56,7 +82,7 @@ socket_init()
 int
 socket_bind()
 {
-    fprintf(stderr, "ERR: %s __start\n", __func__ );
+    fprintf(stderr, "ERR: %s __start\n", __func__);
 
     if (bind(tcpSocket.fd, (struct sockaddr *)&tcpSocket.addr, tcpSocket.addr_sz) < 0) {
         fprintf(stderr, "ERR: %s\n", strerror(errno));
@@ -64,7 +90,7 @@ socket_bind()
 
     fprintf(stdout, "Address={%s}, port={%d}\n", TCP_DEFAULT_IP, ntohs(tcpSocket.addr.sin_port));
 
-    fprintf(stderr, "ERR: %s __end\n", __func__ );
+    fprintf(stderr, "ERR: %s __end\n", __func__);
     return 0;
 }
 
@@ -74,13 +100,13 @@ socket_bind()
 int
 socket_listen()
 {
-    fprintf(stderr, "ERR: %s __start\n", __func__ );
+    fprintf(stderr, "ERR: %s __start\n", __func__);
 
     if (listen(tcpSocket.fd, TCP_DEFAULT_BACKLOG) < 0) {
         fprintf(stderr, "ERR: %s\n", strerror(errno));
     }
 
-    fprintf(stderr, "ERR: %s __end\n", __func__ );
+    fprintf(stderr, "ERR: %s __end\n", __func__);
     return 0;
 }
 
@@ -90,12 +116,12 @@ socket_listen()
 int
 socket_accept()
 {
-    fprintf(stderr, "ERR: %s __start\n", __func__ );
+    fprintf(stderr, "ERR: %s __start\n", __func__);
 
     struct sockaddr_in t_client;
     memset(&t_client, 0, sizeof(struct sockaddr_in));
     socklen_t t_client_sz = sizeof(struct sockaddr_in);
-    int t_client_fd = -1;
+    int t_client_fd;
 
     if (t_client_fd = accept(tcpSocket.fd, (struct sockaddr *)&t_client, &t_client_sz), t_client_fd < 0) {
         fprintf(stderr, "ERR: %s\n", strerror(errno));
@@ -119,7 +145,7 @@ socket_accept()
     tcpSocket.clients.tail->addr_sz = t_client_sz;
     tcpSocket.clients.tail->fd = t_client_fd;
 
-    fprintf(stderr, "ERR: %s __end\n", __func__ );
+    fprintf(stderr, "ERR: %s __end\n", __func__);
     return 0;
 }
 
@@ -129,9 +155,9 @@ socket_accept()
 int
 socket_recv()
 {
-    fprintf(stderr, "ERR: %s __start\n", __func__ );
+    fprintf(stderr, "ERR: %s __start\n", __func__);
 
-    fprintf(stderr, "ERR: %s __end\n", __func__ );
+    fprintf(stderr, "ERR: %s __end\n", __func__);
     return 0;
 }
 
@@ -141,20 +167,35 @@ socket_recv()
 int
 socket_send()
 {
-    fprintf(stderr, "ERR: %s __start\n", __func__ );
+    fprintf(stderr, "ERR: %s __start\n", __func__);
 
-    fprintf(stderr, "ERR: %s __end\n", __func__ );
+    fprintf(stderr, "ERR: %s __end\n", __func__);
     return 0;
 }
 
 /*
  *
  * */
-int
+_Noreturn int
 server_start()
 {
-    fprintf(stderr, "ERR: %s __start\n", __func__ );
+    fprintf(stderr, "ERR: %s __start\n", __func__);
 
-    fprintf(stderr, "ERR: %s __end\n", __func__ );
-    return 0;
+    signal(SIGKILL, exit_func);
+    signal(SIGTERM, exit_func);
+    signal(SIGINT,  exit_func);
+
+    socket_init();
+    socket_bind();
+    socket_listen();
+
+    while (1) {
+        tcpSocket.poll_ret = poll(tcpSocket.poll_fds, tcpSocket.poll_max, -1);
+
+        if (tcpSocket.poll_fds[0].events & POLLIN) { /* New Connection */
+            socket_accept();
+        }
+    }
+    //fprintf(stderr, "ERR: %s __end\n", __func__);
+    //return 0;
 }
