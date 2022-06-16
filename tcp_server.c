@@ -16,7 +16,7 @@ void
 exit_func (int signo)
 {
     fprintf(stderr, \
-		"\nGot signo{%d}\nTerminating...\n\n", \
+		"\nGot signal# {%d}\nTerminating...\n\n", \
 		signo);
 
     close(tcpSocket.fd);
@@ -70,7 +70,7 @@ socket_init()
     tcpSocket.poll_fds_sz = TCP_POLL_CHUNK_SZ;
 
     tcpSocket.poll_fds->fd = tcpSocket.fd;
-    tcpSocket.poll_fds->events = POLLIN | POLLPRI;
+    tcpSocket.poll_fds->events = POLLIN | POLLPRI | POLLERR;
 
     fprintf(stderr, "ERR: %s __end\n", __func__);
     return 0;
@@ -88,7 +88,7 @@ socket_bind()
         fprintf(stderr, "ERR: %s\n", strerror(errno));
     }
 
-    fprintf(stdout, "Address={%s}, port={%d}\n", TCP_DEFAULT_IP, ntohs(tcpSocket.addr.sin_port));
+    fprintf(stdout, "Socket Address={%s}, port={%d}\n", TCP_DEFAULT_IP, ntohs(tcpSocket.addr.sin_port));
 
     fprintf(stderr, "ERR: %s __end\n", __func__);
     return 0;
@@ -127,7 +127,7 @@ socket_accept()
         fprintf(stderr, "ERR: %s\n", strerror(errno));
         return -1;
     } else {
-        fprintf(stdout, "Address={%s}, port={%d}\n", TCP_DEFAULT_IP, ntohs(t_client.sin_port));
+        fprintf(stdout, "Client Address={%s}, port={%d}\n", TCP_DEFAULT_IP, ntohs(t_client.sin_port));
     }
 
     if (tcpSocket.clients.head == NULL) {
@@ -144,6 +144,11 @@ socket_accept()
     memcpy(&tcpSocket.clients.tail->addr, &t_client, sizeof(struct sockaddr_in));
     tcpSocket.clients.tail->addr_sz = t_client_sz;
     tcpSocket.clients.tail->fd = t_client_fd;
+
+    tcpSocket.poll_fds[tcpSocket.poll_max].fd = t_client_fd;
+    tcpSocket.poll_fds[tcpSocket.poll_max].events = POLLIN | POLLPRI | POLLERR;
+
+    tcpSocket.poll_max += 1;
 
     fprintf(stderr, "ERR: %s __end\n", __func__);
     return 0;
@@ -189,13 +194,25 @@ server_start()
     socket_bind();
     socket_listen();
 
+    tcp_socket sock = &tcpSocket;
+
     while (1) {
         tcpSocket.poll_ret = poll(tcpSocket.poll_fds, tcpSocket.poll_max, -1);
+        fprintf(stderr, "ERR: %s %d\n", "poll returned", tcpSocket.poll_ret);
 
-        if (tcpSocket.poll_fds[0].events & POLLIN) { /* New Connection */
+        if (tcpSocket.poll_fds[0].revents & POLLIN) { /* New Connection */
             socket_accept();
+            tcpSocket.poll_ret -= 1;
+        }
+
+        for (uint32_t i = 1; i <= tcpSocket.poll_max && tcpSocket.poll_ret > 0; i++) {
+            if (tcpSocket.poll_fds[i].revents & POLLHUP) { /* Close Connection */
+                tcpSocket.poll_fds[i].fd = -1;
+                tcpSocket.poll_fds[i].events = 0;
+                tcpSocket.poll_fds[i].revents = 0;
+                tcpSocket.poll_ret -= 1;
+            }
         }
     }
-    //fprintf(stderr, "ERR: %s __end\n", __func__);
-    //return 0;
+    /* Unreachable */
 }
