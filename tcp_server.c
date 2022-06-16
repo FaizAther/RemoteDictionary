@@ -178,6 +178,42 @@ socket_send()
     return 0;
 }
 
+int
+t_remove_buf(tcp_str buff) {
+    if (buff == NULL) { return 0; }
+    free(buff);
+    return t_remove_buf(buff->next);
+}
+
+int
+t_remove_client(tcp_client curr) {
+    t_remove_buf(curr->buf);
+    if (tcpSocket.clients.curr == tcpSocket.clients.head) { /* head case */
+        curr->next->prev = curr->prev;
+        tcpSocket.clients.head = curr->next;
+    } else if (tcpSocket.clients.curr == tcpSocket.clients.tail) { /* tail case */
+        curr->prev->next = curr->next;
+        tcpSocket.clients.tail = curr->prev;
+    } else { /* center case */
+        curr->next->prev = curr->prev;
+        curr->prev->next = curr->next;
+    }
+    free(curr);
+    tcpSocket.clients.size -= 1;
+    return 0;
+}
+
+int
+t_remove_fd_client_list(int fd)
+{
+    for (tcpSocket.clients.curr = tcpSocket.clients.head; tcpSocket.clients.curr != NULL; tcpSocket.clients.curr = tcpSocket.clients.curr->next) {
+        if (tcpSocket.clients.curr->fd == fd) { /* Remove this */
+            t_remove_client(tcpSocket.clients.curr);
+        }
+    }
+    return 0;
+}
+
 /*
  *
  * */
@@ -207,6 +243,7 @@ server_start()
 
         for (uint32_t i = 1; i <= tcpSocket.poll_max && tcpSocket.poll_ret > 0; i++) {
             if (tcpSocket.poll_fds[i].revents & POLLHUP) { /* Close Connection */
+                t_remove_fd_client_list(tcpSocket.poll_fds[i].fd);
                 tcpSocket.poll_fds[i].fd = -1;
                 tcpSocket.poll_fds[i].events = 0;
                 tcpSocket.poll_fds[i].revents = 0;

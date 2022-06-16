@@ -41,6 +41,7 @@ typedef tcp_client_t *tcp_client;
 typedef struct tcp_clients_list_t {
     tcp_client head;
     tcp_client tail;
+    tcp_client curr;
     uint32_t size;
 } tcp_clients_list_t;
 typedef tcp_clients_list_t *tcp_clients_list;
