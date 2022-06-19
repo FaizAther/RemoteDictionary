@@ -5,12 +5,14 @@
 #ifndef TCP_SOCKET_DICTIONARYCONNECTOR_H
 #define TCP_SOCKET_DICTIONARYCONNECTOR_H
 
+#define TCP_BUF_SZ 1460
+
 #ifdef __cplusplus
 extern "C" {
 #else
 #endif
 
-void Dictionary_process(char buf[512]);
+void Dictionary_process(char buf[TCP_BUF_SZ]);
 
 #ifdef __cplusplus
 }

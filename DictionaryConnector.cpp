@@ -5,8 +5,6 @@
 #include "DictionaryConnector.h"
 #include "Dictionary.h"
 
-#define TCP_BUF_SZ 1460
-
 #ifdef __cplusplus
 extern "C" {
 #endif
