@@ -9,7 +9,7 @@ extern "C" {
 int
 main(void)
 {
-    std::cout << "JELLO\n";
+    std::cout << "CLIENT HELLO\n";
 
     client_init(5000);
     client_handle();
