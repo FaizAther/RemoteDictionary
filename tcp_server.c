@@ -155,11 +155,12 @@ socket_accept() {
 
 /*
  * A simple memcpy for now
- * TODO: Parse the reader_str, Query the dictionary here. Throw the response in the writer_str.
+ * TODO: Some JSON library
  * */
 size_t
 sock_process(tcp_client client) {
-    memcpy(client->writer_str.sbuf, client->reader_str.sbuf, client->reader_str.sbuf_sz);
+    Dictionary_process(client->reader_str.sbuf);
+    memcpy(client->writer_str.sbuf, client->reader_str.sbuf, TCP_BUF_SZ);
     client->writer_str.sbuf_sz = client->reader_str.sbuf_sz;
     return client->reader_str.sbuf_sz;
 }

@@ -8,6 +8,8 @@
 #include <sys/poll.h>
 #include <arpa/inet.h>
 
+#include "DictionaryConnector.h"
+
 #define TCP_POLL_CHUNK_SZ 1024
 
 #define TCP_DEFAULT_BACKLOG 8
