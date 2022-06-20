@@ -46,7 +46,7 @@ std::string Dictionary::stats() {
 
 std::string Dictionary::process(std::string query) {
     try {
-        process_handle(query);
+        return process_handle(query);
     } catch (const std::exception &) {
         return {"{}"};
     }
