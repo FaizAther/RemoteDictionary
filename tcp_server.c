@@ -221,7 +221,7 @@ socket_send(void *vclient) {
     fprintf(stderr, "SEND: Client Address={%s}, port={%d} ", TCP_DEFAULT_IP, ntohs(client->addr.sin_port));
     fprintf(stderr, "TO: fd={%d}, bytes={%zd}, str={%s}\n", client->fd, client->writer_str.sbuf_sz, client->writer_str.sbuf);
 
-    ssize_t err = write(client->fd, client->writer_str.sbuf, client->writer_str.sbuf_sz);
+    ssize_t err = write(client->fd, client->writer_str.sbuf, TCP_BUF_SZ);
     if (err < 1 || err > client->writer_str.sbuf_sz) {
         fprintf(stderr, "write: %zd %s\n", err, strerror(errno));
     }

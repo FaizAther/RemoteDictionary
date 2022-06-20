@@ -1,0 +1,3 @@
+{"cmd":"SET", "key":"a", "val":"z"}
+{"cmd":"GET", "key":"a"}
+{"cmd":"STATUS"}

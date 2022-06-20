@@ -49,7 +49,7 @@ client_handle() {
             fprintf(stderr, "ERR: read_IN %d %s\n", tcpClient.err, strerror(errno));
             continue;
         }
-        putchar('\n');
+//        putchar('\n');
         tcpClient.err = write(tcpClient.fd, buf, strlen(buf));
         if (tcpClient.err <= 0) {
             fprintf(stderr, "ERR: write_SOCK %d %s\n", tcpClient.err, strerror(errno));
@@ -65,5 +65,6 @@ client_handle() {
             fprintf(stderr, "ERR: write_OUT %d %s\n", tcpClient.err, strerror(errno));
             continue;
         }
+        putchar('\n');
     }
 }

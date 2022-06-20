@@ -115,9 +115,10 @@ std::string Dictionary::process_handle(std::string query) {
             response += "\"}";
         } else {
             response = "{";
-            response += R"("KEY:")";
+            response += R"("key":")";
             response += key;
-            response += R"("VALUE:")";
+            response += "\",";
+            response += R"("val:")";
             response += retS;
             response += "\"}";
         }
